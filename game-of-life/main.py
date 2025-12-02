@@ -1,3 +1,6 @@
+import os
+import sys
+import time
 import random
 
 # Создание мёртвой доски
@@ -17,11 +20,24 @@ def random_state(rows, cols):
 
     return state
 
+def load_board_state(file_name, rows, cols):
+    state = dead_state(rows, cols)
+    with open(file_name, 'r') as file:
+        pattern = [[int(cell) for cell in row.strip()] for row in file.readlines()]
+    
+    start_row = (rows - len(pattern)) // 2
+    start_col = (cols - len(pattern[0])) // 2
+
+    for i in range(len(pattern)):
+        for j in range(len(pattern[i])):
+            state[start_row + i][start_col + j] = pattern[i][j]
+    return state
+
 # Вывод состояния доски в терминал
 def render(state):
     for row in state:
         for cell in row:
-            print('■' if cell == 1 else '□', end=' ')
+            print('\033[37m#\033[0m' if cell == 1 else '\033[30m#\033[0m', end=' ')
         print()
 
 # Подсчёт соседей
@@ -67,4 +83,22 @@ def next_board_state(state):
     return new_state
 
 if __name__ == "__main__":
-    render(random_state(100, 100))
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'toad':
+            if len(sys.argv) > 2:
+                file_name = sys.argv[2]
+            else:
+                file_name = 'toad.txt'
+            print(f'Loading board state from {file_name}')
+            state = load_board_state(file_name, 100, 100)
+        else:
+            print('Invalid argument')
+            sys.exit(1)
+    else:
+        state = random_state(100, 100)
+
+    while True:
+        render(state)
+        state = next_board_state(state)
+        time.sleep(0.1)
+        os.system('cls' if os.name == 'nt' else 'clear')
