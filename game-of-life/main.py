@@ -17,5 +17,13 @@ def random_state(rows, cols):
 
     return state
 
+# Вывод состояния доски в терминал
+def render(state):
+    for row in state:
+        for cell in row:
+            # print("#" if cell == 1 else " ", end = ' ')
+            print('■' if cell == 1 else '□', end=' ')
+        print()
 
-print(random_state(10, 10))
+
+render(random_state(100, 100))
